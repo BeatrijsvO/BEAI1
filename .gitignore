@@ -1,0 +1,24 @@
+# Virtuele omgeving
+venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Configuratiebestanden
+*.env
+
+# Systeembestanden
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker bestanden
+docker-compose.override.yml
+
+# Andere tijdelijke bestanden
+.idea/
+.vscode/
