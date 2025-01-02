@@ -7,6 +7,8 @@ app = FastAPI()
 # Haal DATABASE_URL op vanuit de omgeving
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+print(f"DATABASE_URL: {DATABASE_URL}")
+
 @app.get("/")
 def read_root():
     return {"message": "Hello from CKBA!"}
