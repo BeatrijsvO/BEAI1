@@ -1,13 +1,15 @@
 from fastapi import FastAPI
-import psycopg2
 import os
+from dotenv import load_dotenv
 
-app = FastAPI()
+# Laad het .env-bestand
+load_dotenv()
 
-# Haal DATABASE_URL op vanuit de omgeving
+# Haal DATABASE_URL op
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-print(f"DATABASE_URL: {DATABASE_URL}")
+# Definieer de FastAPI-app
+app = FastAPI()
 
 @app.get("/")
 def read_root():
@@ -15,10 +17,7 @@ def read_root():
 
 @app.get("/test-db")
 def test_db():
-    try:
-        # Maak verbinding met de database
-        connection = psycopg2.connect(DATABASE_URL)
-        connection.close()
-        return {"status": "Databaseverbinding succesvol!"}
-    except Exception as e:
-        return {"status": "Fout bij databaseverbinding", "error": str(e)}
+    # Controleer of DATABASE_URL correct is geladen
+    if not DATABASE_URL:
+        return {"error": "DATABASE_URL niet gevonden"}
+    return {"database_url": DATABASE_URL}
