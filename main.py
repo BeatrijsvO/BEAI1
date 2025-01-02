@@ -1,30 +1,20 @@
-from fastapi import FastAPI
-from dotenv import load_dotenv
 import os
-import logging
+from typing import Optional
+from fastapi import FastAPI
+import uvicorn
+import random
 
-# Laad omgevingsvariabelen uit .env-bestand
-load_dotenv()
-
-# Maak een nieuwe FastAPI-applicatie
 app = FastAPI()
 
-# Haal de DATABASE_URL op uit omgevingsvariabelen
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-# Logging instellen voor debugging
-logging.basicConfig(level=logging.INFO)
-
 @app.get("/")
-def read_root():
-    logging.info("Root endpoint accessed.")
-    return {"message": "Hello from CKBA with Hypercorn!"}
+def home():
+    return {"Hello": "World from FastAPI"}
 
-@app.get("/test-db")
-def test_db():
-    if not DATABASE_URL:
-        logging.error("DATABASE_URL is not set.")
-        return {"error": "DATABASE_URL is not set in the environment variables."}
-    try:
-        # Simuleer een test met de databaseverbinding
-        logging.info(f"
+# get random number between min(default:0) and max(default:9)
+@app.get("/random/")
+def get_random(min: Optional[int] = 0, max: Optional[int] = 9):
+    rval = random.randint(min, max)
+    return { "value": rval }
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=os.getenv("PORT", default=5000), log_level="info")
