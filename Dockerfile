@@ -8,5 +8,5 @@ WORKDIR /app
 COPY . .
 
 # Start het Python-script
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
 
