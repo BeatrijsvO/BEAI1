@@ -9,6 +9,9 @@ __pycache__/
 # Configuratiebestanden
 *.env
 
+#app vervangen voor main
+app_old.py
+
 # Systeembestanden
 .DS_Store
 Thumbs.db
