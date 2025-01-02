@@ -1,5 +1,5 @@
 # Gebruik een lichtgewicht Python-image
-FROM python:3.10-slim
+FROM python:3.13.1
 
 # Stel de werkdirectory in
 WORKDIR /app
