@@ -25,3 +25,6 @@ docker-compose.override.yml
 # Andere tijdelijke bestanden
 .idea/
 .vscode/
+
+#dockerfile
+Dockerfile-old
