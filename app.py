@@ -1,15 +1,10 @@
 from fastapi import FastAPI
 import psycopg2
+import os
 
 app = FastAPI()
 
-from dotenv import load_dotenv
-import os
-
-# Laad de variabelen uit het .env-bestand
-load_dotenv()
-
-# Haal DATABASE_URL op
+# Haal DATABASE_URL op vanuit de omgeving
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 @app.get("/")
