@@ -21,26 +21,3 @@ def test_db():
     if not DATABASE_URL:
         return {"error": "DATABASE_URL niet gevonden"}
     return {"database_url": DATABASE_URL}
-
-add_shortcode('ckba_test_db', 'ckba_test_db');
-
-function ckba_test_db() {
-    $response = wp_remote_get('https://your-fastapi-server-url.com/test-db');
-
-    if (is_wp_error($response)) {
-        return 'Fout bij verbinding met de database: ' . $response->get_error_message();
-    }
-
-    $body = wp_remote_retrieve_body($response);
-    $data = json_decode($body, true);
-
-    if (isset($data['database_url'])) {
-        return '<p>Database verbonden: ' . esc_html($data['database_url']) . '</p>';
-    } else if (isset($data['error'])) {
-        return '<p>Fout: ' . esc_html($data['error']) . '</p>';
-    } else {
-        return 'Onverwachte response van de server.';
-    }
-}
-
-
