@@ -21,3 +21,13 @@ def test_db():
     if not DATABASE_URL:
         return {"error": "DATABASE_URL niet gevonden"}
     return {"database_url": DATABASE_URL}
+
+
+# Definieer Document Retrieval
+from document_retrieval import fetch_documents_from_source
+
+@app.get("/fetch-documents")
+def fetch_documents():
+    connection_details = {"directory": "/path/to/documents"}
+    documents = fetch_documents_from_source("local", connection_details)
+    return {"documents": documents}
