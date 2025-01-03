@@ -31,3 +31,12 @@ def test_db():
     if not DATABASE_URL:
         return {"error": "DATABASE_URL niet gevonden"}
     return {"database_url": DATABASE_URL}
+
+TESTJE = True
+@app.get("/shortcut1")
+def shortcut_1():
+    # Controleer of dit TESTje werkt
+    if not TESTJE:
+        return {"error": "TESTJE niet gevonden"}
+    return {"shortcut1": TESTJE}
+
