@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from vectorstore.store import SimpleVectorStore
-from nlp.generation import generate_answer
+from nlpgen.generation import generate_answer
 
 # Laad het .env-bestand
 load_dotenv()
