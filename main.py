@@ -1,7 +1,12 @@
-from fastapi import FastAPI
+# from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from vectorstore.store import SimpleVectorStore
+from nlp.generation import generate_answer
 
 # Laad het .env-bestand
 load_dotenv()
@@ -39,4 +44,36 @@ def shortcut_1():
     if not TESTJE:
         return {"error": "TESTJE niet gevonden"}
     return {"shortcut1": TESTJE}
+
+# Dummy dataset
+texts = [
+    "FastAPI is een modern webframework voor Python.",
+    "Retrieval-Augmented Generation combineert zoekfunctionaliteit met tekstgeneratie.",
+    "Vectorstores zoals FAISS worden vaak gebruikt om semantische zoekopdrachten te versnellen.",
+    "Het ontwikkelen van een CKBA-product vereist een combinatie van backend, frontend en machine learning."
+]
+
+# Initialiseer vectorstore en voeg teksten toe
+vectorstore = SimpleVectorStore()
+vectorstore.add_texts(texts)
+
+# Requestmodel
+class QuestionRequest(BaseModel):
+    question: str
+
+@app.post("/answer")
+async def answer_question(request: QuestionRequest):
+    """
+    Beantwoord een vraag op basis van de opgeslagen teksten.
+    """
+    try:
+        # Zoek relevante context
+        relevant_context = vectorstore.search(request.question, top_k=3)
+        context = "\n".join(relevant_context)
+
+        # Genereer antwoord
+        answer = generate_answer(request.question, context)
+        return {"question": request.question, "context": relevant_context, "answer": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fout bij beantwoording: {str(e)}")
 
