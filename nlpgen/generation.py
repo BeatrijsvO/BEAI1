@@ -1,20 +1,19 @@
-from transformers import pipeline
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
-# Initialiseer de NLP-pipeline
-nlp_pipeline = pipeline("text-generation", model="distilgpt2")
+# Vervang BLOOMZ door Flan-T5
+tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
+model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
 
-def generate_answer(question: str, context: str):
-    """
-    Genereer een antwoord op basis van een vraag en context.
-    """
-    # Combineer context en vraag in een prompt
-    prompt = (
-        f"Gebruik de volgende context om de vraag te beantwoorden:\n"
-        f"{context}\n\n"
-        f"Vraag: {question}\n"
-        f"Antwoord:"
-    )
+def generate_answer(question: str, context: str) -> str:
+    prompt = f"Context: {context}\n\nVraag: {question}\nAntwoord:"
+    inputs = tokenizer(prompt, return_tensors="pt", max_length=512, truncation=True)
+    outputs = model.generate(inputs.input_ids, max_length=200, temperature=0.7, top_k=50)
+    return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    # Genereer antwoord zonder truncation in de generate-aanroep
-    result = nlp_pipeline(prompt, max_length=100, num_return_sequences=1)
-    return result[0]["generated_text"]
+
+
+
+    # Haal het antwoord na "Antwoord:" uit de tekst
+    answer = generated_text.split("Antwoord:")[-1].strip()
+
+    return answer

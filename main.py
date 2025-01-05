@@ -1,4 +1,3 @@
-
 from nlpgen.generation import generate_answer  # Importeer de aangepaste BLOOMZ-functie
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -29,6 +28,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Initialiseer de vectorstore
+vectorstore = SimpleVectorStore()
+
+# Probeer de opgeslagen vectorstore te laden
+try:
+    vectorstore.load_store("vectorstore.index")
+    print("Vectorstore succesvol geladen van disk.")
+except FileNotFoundError:
+    print("Geen opgeslagen vectorstore gevonden. Nieuwe store wordt aangemaakt.")
 
 @app.get("/")
 async def root():
@@ -41,43 +49,19 @@ def test_db():
         return {"error": "DATABASE_URL niet gevonden"}
     return {"database_url": DATABASE_URL}
 
-
-# Dummy dataset
-texts = [
-    "FastAPI is een modern webframework voor Python.",
-    "Retrieval-Augmented Generation combineert zoekfunctionaliteit met tekstgeneratie.",
-    "Vectorstores zoals FAISS worden vaak gebruikt om semantische zoekopdrachten te versnellen.",
-    "Het ontwikkelen van een CKBA-product vereist een combinatie van backend, frontend en machine learning."
-]
-
-# Initialiseer vectorstore en voeg teksten toe
-vectorstore = SimpleVectorStore()
-vectorstore.add_texts(texts)
-
 # Requestmodel
 class QuestionRequest(BaseModel):
     question: str
-
-
-
 
 @app.post("/upload")
 async def upload_document(file: UploadFile = File(...)):
     try:
         content = (await file.read()).decode('utf-8')  # Verwerk tekst
         vectorstore.add_texts([content])  # Voeg toe aan de vectorstore
-        return {"filename": file.filename, "message": "Document succesvol geupload."}
+        vectorstore.save_store("vectorstore.index")  # Sla de bijgewerkte vectorstore op
+        return {"filename": file.filename, "message": "Document succesvol geüpload en opgeslagen."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")
-
-
-
-
-# Dummy vectorstore
-vectorstore = SimpleVectorStore()
-
-class QuestionRequest(BaseModel):
-    question: str
 
 @app.post("/answer")
 async def answer_question(request: QuestionRequest):
@@ -95,4 +79,3 @@ async def answer_question(request: QuestionRequest):
         return {"question": request.question, "context": relevant_context, "answer": answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fout bij beantwoording: {str(e)}")
-
