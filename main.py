@@ -69,8 +69,7 @@ async def answer_question(request: QuestionRequest):
     try:
         # Zoek relevante context
         relevant_context = vectorstore.search(request.question, top_k=3)
-        context = "\n".join(relevant_context)
-
+        context = "\n".join(relevant_context[:3])  # Beperk de context tot 3 resultaten
         # Genereer antwoord
         answer = generate_answer(request.question, context)
         return {"question": request.question, "context": relevant_context, "answer": answer}

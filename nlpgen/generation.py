@@ -16,5 +16,5 @@ def generate_answer(question: str, context: str):
     )
 
     # Genereer antwoord zonder truncation in de generate-aanroep
-    result = nlp_pipeline(prompt, max_length=150, num_return_sequences=1)
+    result = nlp_pipeline(prompt, max_length=100, num_return_sequences=1)
     return result[0]["generated_text"]
