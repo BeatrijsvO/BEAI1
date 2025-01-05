@@ -1,10 +1,11 @@
 torch>=2.0.1
-transformers>=4.34.0
 fastapi==0.100.0
 hypercorn==0.14.4
 python-dotenv
 requests==2.31.0
-sentence-transformers==2.2.2
 langchain==0.0.172
 faiss-cpu==1.7.4
 python-multipart
+transformers>=4.34.0
+sentence-transformers==2.2.2
+huggingface_hub>=0.15.1,<0.17.0
