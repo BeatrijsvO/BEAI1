@@ -1,4 +1,5 @@
-# from fastapi import FastAPI
+
+from nlpgen.generation import generate_answer  # Importeer de aangepaste BLOOMZ-functie
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -6,7 +7,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from vectorstore.store import SimpleVectorStore
-from nlpgen.generation import generate_answer
 
 from fastapi import File, UploadFile
 import tempfile
@@ -60,6 +60,7 @@ class QuestionRequest(BaseModel):
 
 
 
+
 @app.post("/upload")
 async def upload_document(file: UploadFile = File(...)):
     try:
@@ -71,17 +72,26 @@ async def upload_document(file: UploadFile = File(...)):
 
 
 
+
+# Dummy vectorstore
+vectorstore = SimpleVectorStore()
+
+class QuestionRequest(BaseModel):
+    question: str
+
 @app.post("/answer")
 async def answer_question(request: QuestionRequest):
-    """
-    Beantwoord een vraag op basis van de opgeslagen teksten.
-    """
     try:
-        # Zoek relevante context
+        # Zoek relevante context in de vectorstore
         relevant_context = vectorstore.search(request.question, top_k=3)
-        context = "\n".join(relevant_context[:3])  # Beperk de context tot 3 resultaten
+        context = "\n".join(relevant_context)
+
+        if not context.strip():
+            return {"question": request.question, "answer": "Geen relevante informatie gevonden in de data."}
+
         # Genereer antwoord
         answer = generate_answer(request.question, context)
+
         return {"question": request.question, "context": relevant_context, "answer": answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fout bij beantwoording: {str(e)}")
