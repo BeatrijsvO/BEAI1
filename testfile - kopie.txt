@@ -1,3 +1,0 @@
-Dit is een voorbeeldbestand voor CKBA.
-FastAPI maakt het eenvoudig om endpoints te bouwen.
-Vectorstores zijn geweldig voor semantische zoekopdrachten.
