@@ -72,7 +72,7 @@ async def upload_documents(files: list[UploadFile]):
         file_documents = [Document(page_content=text.strip(), metadata={"source": file.filename}) for text in texts if text.strip()]
         documents.extend(file_documents)
 
-    # Log het aantal geüploade documenten
+    # Log het aantal geuploade documenten
     print(f"Aantal documenten: {len(documents)}")
 
     # Hier kun je documenten opslaan in een vectorstore of database
