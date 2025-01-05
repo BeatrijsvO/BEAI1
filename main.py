@@ -8,6 +8,9 @@ from pydantic import BaseModel
 from vectorstore.store import SimpleVectorStore
 from nlpgen.generation import generate_answer
 
+from fastapi import File, UploadFile
+import tempfile
+
 # Laad het .env-bestand
 load_dotenv()
 
@@ -25,6 +28,31 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+@app.post("/upload")
+async def upload_document(file: UploadFile = File(...)):
+    """
+    Upload een document en voeg de inhoud toe aan de vectorstore.
+    """
+    try:
+        # Sla het bestand tijdelijk op
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(file.file.read())
+            temp_path = temp_file.name
+
+        # Lees en verwerk het document (hier zou je een parser toevoegen)
+        with open(temp_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Voeg inhoud toe aan vectorstore
+        vectorstore.add_texts([content])
+
+        return {"filename": file.filename, "message": "Document succesvol geupload."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")
+
 
 @app.get("/")
 async def root():
