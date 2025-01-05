@@ -30,30 +30,6 @@ app.add_middleware(
 )
 
 
-
-@app.post("/upload")
-async def upload_document(file: UploadFile = File(...)):
-    """
-    Upload een document en voeg de inhoud toe aan de vectorstore.
-    """
-    try:
-        # Sla het bestand tijdelijk op
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_file.write(file.file.read())
-            temp_path = temp_file.name
-
-        # Lees en verwerk het document (hier zou je een parser toevoegen)
-        with open(temp_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-
-        # Voeg inhoud toe aan vectorstore
-        vectorstore.add_texts([content])
-
-        return {"filename": file.filename, "message": "Document succesvol geupload."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")
-
-
 @app.get("/")
 async def root():
     return {"greeting": "Hello, World!", "message": "Welcome to FastAPI!"}
@@ -65,13 +41,6 @@ def test_db():
         return {"error": "DATABASE_URL niet gevonden"}
     return {"database_url": DATABASE_URL}
 
-TESTJE = True
-@app.get("/shortcut1")
-def shortcut_1():
-    # Controleer of dit TESTje werkt
-    if not TESTJE:
-        return {"error": "TESTJE niet gevonden"}
-    return {"shortcut1": TESTJE}
 
 # Dummy dataset
 texts = [
@@ -88,6 +57,19 @@ vectorstore.add_texts(texts)
 # Requestmodel
 class QuestionRequest(BaseModel):
     question: str
+
+
+
+@app.post("/upload")
+async def upload_document(file: UploadFile = File(...)):
+    try:
+        content = (await file.read()).decode('utf-8')  # Verwerk tekst
+        vectorstore.add_texts([content])  # Voeg toe aan de vectorstore
+        return {"filename": file.filename, "message": "Document succesvol geüpload."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")
+
+
 
 @app.post("/answer")
 async def answer_question(request: QuestionRequest):
