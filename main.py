@@ -59,22 +59,24 @@ nlp_pipeline = pipeline("text-generation", model="bigscience/bloomz-1b7")
 # 4. Nieuw voor CKBA en website
 @app.post("/upload")
 async def upload_documents(files: list[UploadFile]):
-    """
-    Upload en verwerk documenten.
-    """
-    documents = []
-    for file in files:
-        # Lees en decodeer de inhoud van elk bestand
-        content = (await file.read()).decode('utf-8')  # Pas encoding aan als nodig
-        texts = content.split('\n')
-        file_documents = [Document(page_content=text.strip(), metadata={"source": file.filename}) for text in texts if text.strip()]
-        documents.extend(file_documents)
+    try:
+        documents = []
+        for file in files:
+            content = (await file.read()).decode('utf-8')
+            texts = content.split('\n')
+            file_documents = [Document(page_content=text.strip(), metadata={"source": file.filename}) for text in texts if text.strip()]
+            documents.extend(file_documents)
 
-    # Log het aantal geuploade documenten
-    print(f"Aantal documenten: {len(documents)}")
+        print(f"Aantal documenten: {len(documents)}")
+        return {"message": f"{len(documents)} documenten succesvol geupload en verwerkt."}
+    except Exception as e:
+        print(f"Fout tijdens upload: {e}")
+        raise HTTPException(status_code=500, detail=f"Fout bij upload: {e}")
 
-    # Hier kun je documenten opslaan in een vectorstore of database
-    return {"message": f"{len(documents)} documenten succesvol geupload en verwerkt."}
+
+
+
+
 
 # 5. Maak de FAISS-vectorstore
 document_texts = [doc.page_content for doc in documents]
