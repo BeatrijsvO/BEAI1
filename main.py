@@ -1,4 +1,4 @@
-from nlpgen.generation import generate_answer  # Importeer de aangepaste BLOOMZ-functie
+urom nlpgen.generation import generate_answer  # Importeer de aangepaste BLOOMZ-functie
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -59,7 +59,7 @@ async def upload_document(file: UploadFile = File(...)):
         content = (await file.read()).decode('utf-8')  # Verwerk tekst
         vectorstore.add_texts([content])  # Voeg toe aan de vectorstore
         vectorstore.save_store("vectorstore.index")  # Sla de bijgewerkte vectorstore op
-        return {"filename": file.filename, "message": "Document succesvol geüpload en opgeslagen."}
+        return {"filename": file.filename, "message": "Document succesvol geupload en opgeslagen."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")
 
