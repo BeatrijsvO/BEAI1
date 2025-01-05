@@ -34,8 +34,6 @@ app.add_middleware(
 
 
 
-
-
 # 2. Definieer een Wrapper voor SentenceTransformer
 class SentenceTransformerWrapper(Embeddings):
     def __init__(self, model_name="sentence-transformers/all-MiniLM-L6-v2"):
@@ -76,7 +74,7 @@ async def upload_documents(files: list[UploadFile]):
     print(f"Aantal documenten: {len(documents)}")
 
     # Hier kun je documenten opslaan in een vectorstore of database
-    return {"message": f"{len(documents)} documenten succesvol geüpload en verwerkt."}
+    return {"message": f"{len(documents)} documenten succesvol geupload en verwerkt."}
 
 # 5. Maak de FAISS-vectorstore
 document_texts = [doc.page_content for doc in documents]
@@ -113,47 +111,6 @@ def generate_answer(vraag, context):
     print(f"DEBUG Result:\n{result}")  # Debugging
     print(f"DEBUG Result[0] Generated tekst:\n{result[0]['generated_text']}")  # Debugging
     return result[0]['generated_text']
-
-# 8. Hoofdfunctie: Vraag en antwoord
-
-def kba_antwoord(vraag):
-    relevante_documenten = retrieve_documents(vraag)
-    context = "\n".join(relevante_documenten)
-
-    antwoord = generate_answer(vraag, context)
-
-    print(f"DEBUG Gevonden documenten:\n{relevante_documenten}")
-    print(f"DEBUG antwoord in kba_antwoord:\n{antwoord}")
-
-    return antwoord
-
-# Testvraag
-#vraag = "Wat moet ik doen met bedrijfsapparatuur?"
-vraag = "Hoe laat is het lunchpauze?"
-antwoord = kba_antwoord(vraag)
-print(f"EINDE DEBUG antwoord:\n{antwoord}")
-
-#print(f"Vraag : {vraag}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
