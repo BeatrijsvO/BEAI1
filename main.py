@@ -3,7 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 
-from fastapi import FastAPI, HTTPException
+from sentence_transformers import SentenceTransformer
+from langchain.vectorstores import FAISS
+from langchain.embeddings.base import Embeddings
+from langchain.docstore.document import Document
+from transformers import pipeline
+
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from vectorstore.store import SimpleVectorStore
 from nlpgen.generation import generate_answer
@@ -27,12 +33,7 @@ app.add_middleware(
 )
 
 
-from sentence_transformers import SentenceTransformer
-from langchain.vectorstores import FAISS
-from langchain.embeddings.base import Embeddings
-from langchain.docstore.document import Document
-from transformers import pipeline
-from google.colab import files
+
 
 
 # 2. Definieer een Wrapper voor SentenceTransformer
@@ -56,17 +57,26 @@ embeddings_model = SentenceTransformerWrapper()
 # Gebruik BLOOMZ als krachtiger model
 nlp_pipeline = pipeline("text-generation", model="bigscience/bloomz-1b7")
 
-# 4. Upload documenten
-uploaded = files.upload()
-documents = []
 
-for file_name, file_content in uploaded.items():
-    content = file_content.decode('windows-1252')  # Decodeer inhoud
-    texts = content.split('\n')
-    file_documents = [Document(page_content=text.strip(), metadata={"source": file_name}) for text in texts if text.strip()]
-    documents.extend(file_documents)
+# 4. Nieuw voor CKBA en website
+@app.post("/upload")
+async def upload_documents(files: list[UploadFile]):
+    """
+    Upload en verwerk documenten.
+    """
+    documents = []
+    for file in files:
+        # Lees en decodeer de inhoud van elk bestand
+        content = (await file.read()).decode('utf-8')  # Pas encoding aan als nodig
+        texts = content.split('\n')
+        file_documents = [Document(page_content=text.strip(), metadata={"source": file.filename}) for text in texts if text.strip()]
+        documents.extend(file_documents)
 
-print(f"Aantal documenten: {len(documents)}")
+    # Log het aantal geüploade documenten
+    print(f"Aantal documenten: {len(documents)}")
+
+    # Hier kun je documenten opslaan in een vectorstore of database
+    return {"message": f"{len(documents)} documenten succesvol geüpload en verwerkt."}
 
 # 5. Maak de FAISS-vectorstore
 document_texts = [doc.page_content for doc in documents]

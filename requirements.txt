@@ -6,4 +6,3 @@ sentence-transformers==2.2.2
 langchain==0.0.172
 transformers==4.34.0
 faiss-cpu==1.7.4
-google.colab
