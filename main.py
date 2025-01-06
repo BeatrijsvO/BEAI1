@@ -37,13 +37,6 @@ def test_db():
         return {"error": "DATABASE_URL niet gevonden"}
     return {"database_url": DATABASE_URL}
 
-TESTJE = True
-@app.get("/shortcut1")
-def shortcut_1():
-    # Controleer of dit TESTje werkt
-    if not TESTJE:
-        return {"error": "TESTJE niet gevonden"}
-    return {"shortcut1": TESTJE}
 
 # Dummy dataset
 texts = [
@@ -76,3 +69,16 @@ async def answer_question(request: QuestionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fout bij beantwoording: {str(e)}")
 
+
+@app.post("/upload")
+async def upload_document(file: UploadFile):
+    try:
+        # Log details van het bestand
+        print(f"Ontvangen bestand: {file.filename}, content type: {file.content_type}")
+        
+        content = (await file.read()).decode("utf-8")
+        vectorstore.add_texts([content])
+        return {"filename": file.filename, "message": "Document succesvol geüpload en toegevoegd aan de vectorstore."}
+    except Exception as e:
+        print(f"Fout bij uploaden: {e}")
+        raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")

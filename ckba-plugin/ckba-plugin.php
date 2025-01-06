@@ -11,6 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Upload functie
 function ckba_upload_shortcode() {
     ob_start(); ?>
     <form id="ckba-upload-form" enctype="multipart/form-data">
@@ -51,7 +52,7 @@ function ckba_upload_shortcode() {
 add_shortcode('ckba_upload', 'ckba_upload_shortcode');
 
 
-
+// Stel een vraag en geef antwoord
 function ckba_shortcode() {
     ob_start(); ?>
     <form id="ckba-form">
@@ -99,7 +100,7 @@ function ckba_test_db_shortcode() {
     return 'Geen geldige database-informatie ontvangen.';
 }
 
-add_shortcode('ckba_test_db', 'ckba_test_db_shortcode');
+add_shortcode('ckba_test_db_shortcode', 'ckba_test_db_shortcode');
 
 
 
@@ -157,4 +158,3 @@ add_shortcode('ckba_test_db', 'ckba_test_db');
 
 
 ?>
-
