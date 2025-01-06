@@ -2,13 +2,12 @@ from nlpgen.generation import generate_answer  # Importeer de  Flant5 ipv BLOOMZ
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile
+# from fastapi import File
 from pydantic import BaseModel
 from vectorstore.store import SimpleVectorStore
 
-from fastapi import File, UploadFile
-import tempfile
+# import tempfile
 
 # Laad het .env-bestand
 load_dotenv()
@@ -28,15 +27,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialiseer de vectorstore
-vectorstore = SimpleVectorStore()
 
-# Probeer de opgeslagen vectorstore te laden
+# Initialiseer vectorstore
+vectorstore = SimpleVectorStore()
 try:
-    vectorstore.load_store("vectorstore.index")
-    print("Vectorstore succesvol geladen van disk.")
+    os.makedirs("vectorstore", exist_ok=True)  # Zorg dat de map bestaat
+    vectorstore.load_store("vectorstore/vectorstore.index")
+    print("FAISS-index geladen.")
 except FileNotFoundError:
-    print("Geen opgeslagen vectorstore gevonden. Nieuwe store wordt aangemaakt.")
+    print("Geen opgeslagen FAISS-index gevonden. Nieuwe store wordt aangemaakt.")
+    vectorstore = SimpleVectorStore()  # Maak een lege vectorstore aan
+
+
+@app.post("/upload")
+async def upload_document(file: UploadFile):
+    try:
+        content = (await file.read()).decode("utf-8")
+        vectorstore.add_texts([content])  # Voeg de inhoud toe aan de vectorstore
+        vectorstore.save_store("vectorstore/vectorstore.index")  # Sla de index op
+        return {"message": "Document succesvol geupload en toegevoegd aan de vectorstore."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")
+
 
 @app.get("/")
 async def root():
@@ -49,19 +61,10 @@ def test_db():
         return {"error": "DATABASE_URL niet gevonden"}
     return {"database_url": DATABASE_URL}
 
+
 # Requestmodel
 class QuestionRequest(BaseModel):
     question: str
-
-@app.post("/upload")
-async def upload_document(file: UploadFile = File(...)):
-    try:
-        content = (await file.read()).decode('utf-8')  # Verwerk tekst
-        vectorstore.add_texts([content])  # Voeg toe aan de vectorstore
-        vectorstore.save_store("vectorstore.index")  # Sla de bijgewerkte vectorstore op
-        return {"filename": file.filename, "message": "Document succesvol geupload en opgeslagen."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")
 
 @app.post("/answer")
 async def answer_question(request: QuestionRequest):
