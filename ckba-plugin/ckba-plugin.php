@@ -99,7 +99,7 @@ function ckba_test_db_shortcode() {
     return 'Geen geldige database-informatie ontvangen.';
 }
 
-add_shortcode('ckba_test_db', 'ckba_test_db_shortcode');
+add_shortcode('ckba_test_db_shortcode', 'ckba_test_db_shortcode');
 
 
 
@@ -157,4 +157,3 @@ add_shortcode('ckba_test_db', 'ckba_test_db');
 
 
 ?>
-

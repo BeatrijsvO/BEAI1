@@ -1,4 +1,4 @@
-from nlpgen.generation import generate_answer  # Importeer de aangepaste BLOOMZ-functie
+from nlpgen.generation import generate_answer  # Importeer de  Flant5 ipv BLOOMZ-functie
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
