@@ -1,12 +1,11 @@
-# from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
 from dotenv import load_dotenv
-
+from fastapi import UploadFile, File
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from vectorstore.store import SimpleVectorStore
 from nlpgen.generation import generate_answer
+import os
 
 # Laad het .env-bestand
 load_dotenv()
