@@ -78,7 +78,7 @@ async def upload_document(file: UploadFile):
         
         content = (await file.read()).decode("utf-8")
         vectorstore.add_texts([content])
-        return {"filename": file.filename, "message": "Document succesvol geüpload en toegevoegd aan de vectorstore."}
+        return {"filename": file.filename, "message": "Document succesvol geupload en toegevoegd aan de vectorstore."}
     except Exception as e:
         print(f"Fout bij uploaden: {e}")
         raise HTTPException(status_code=500, detail=f"Fout bij uploaden: {str(e)}")
